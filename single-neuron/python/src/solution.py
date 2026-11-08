@@ -16,3 +16,17 @@ class Solution:
         # ReLU: max(0, z)
         # return round(your_answer, 5)
         pass
+
+    def sigmoid(self, x: float) -> float:
+        # This function calculates the sigmoid value of x.
+        # The sigmoid value is always between 0 and 1.
+        # Use this function to convert a value to a probability.
+        return 1 / (1 + np.exp(-x))
+
+    def relu(self, x: float) -> float:
+        # This function calculates the ReLU value of x.
+        # The ReLU value is equal to x when x is positive.
+        # The ReLU value is equal to 0 when x is not positive.
+        return max(0.0, x)
+
+
