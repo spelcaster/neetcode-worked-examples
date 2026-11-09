@@ -15,7 +15,17 @@ class Solution:
         # Sigmoid: σ(z) = 1 / (1 + exp(-z))
         # ReLU: max(0, z)
         # return round(your_answer, 5)
-        pass
+
+        dot = 0.0
+
+        for i in range(len(x)):
+            xi, wi = x[i], w[i]
+            dot += xi * wi
+
+        dot += b
+
+        val =  self.sigmoid(dot) if activation == 'sigmoid' else self.relu(dot)
+        return round(val, 5)
 
     def sigmoid(self, x: float) -> float:
         # This function calculates the sigmoid value of x.
