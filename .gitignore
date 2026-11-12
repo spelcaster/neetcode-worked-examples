@@ -73,3 +73,6 @@ validate-parentheses/cpp/clean/
 .idea/
 *.swp
 .DS_Store
+
+# Playwright MCP session artifacts
+.playwright-mcp/
