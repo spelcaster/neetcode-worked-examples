@@ -49,19 +49,35 @@ Before fetching or writing anything, look at `<problem-slug>/` on disk:
 
 ## Step 3 — Get the problem statement
 
-Try fetching the URL. neetcode.io renders problem content client-side with
-JavaScript, so a plain fetch typically returns only the page shell/title,
-not the description, examples, or constraints — don't spend more than one
-attempt on this before falling back. While you have the fetch result,
-also look for any embedded starter/solution code for the target
-language (e.g. a JSON data blob in the page source) — Step 7 needs it,
-and it's cheaper to look now than to re-fetch later.
+neetcode.io renders problem content client-side with JavaScript, so a
+plain fetch (e.g. `WebFetch`) typically returns only the page shell/title,
+not the description, examples, or constraints. Render the page in a real
+browser instead:
 
-When the fetch doesn't yield real statement text, fall back to your own
-knowledge: neetcode's problems are drawn from well-known interview
-questions (mostly matching LeetCode problems of the same or similar name),
-so you likely already know the statement, function signature, examples,
-and constraints. Reconstruct them from that knowledge.
+- **Preferred: Playwright.** `mcp__playwright__browser_navigate` to the
+  URL, then `mcp__playwright__browser_snapshot` to read the rendered
+  accessibility tree — the description, examples, and constraints should
+  all be in there. While you're on the page, also check it for an
+  embedded starter/solution code block for the target language (often
+  behind a language picker — `mcp__playwright__browser_click` to switch
+  it, then snapshot again) — Step 7 needs it, and it's cheaper to look
+  now than to re-render later. Close the tab with
+  `mcp__playwright__browser_close` when done.
+- **Fallback: Claude in Chrome.** If Playwright isn't available or fails
+  to render the page, load the `anthropic-skills:chrome-browser` skill
+  first, then use it to open the URL in a new tab and read the rendered
+  content the same way (description, examples, constraints, and any
+  starter code for the target language).
+- Don't spend more than one rendering attempt (plus one retry on
+  failure, e.g. page not loaded yet) across both tools before falling
+  back to reconstruction from knowledge below.
+
+When rendering doesn't yield real statement text either, fall back to
+your own knowledge: neetcode's problems are drawn from well-known
+interview questions (mostly matching LeetCode problems of the same or
+similar name), so you likely already know the statement, function
+signature, examples, and constraints. Reconstruct them from that
+knowledge.
 
 Either way, before writing any files, state in one or two sentences what
 problem you understood (e.g. "This is LeetCode's Valid Parentheses:
@@ -101,7 +117,7 @@ the derivation. Include:
    itself calls out (e.g. string length, value ranges).
 
 If Step 3 fell back to reconstructing from knowledge rather than a real
-fetch, say so in this file (a one-line note) so the user knows the
+page render, say so in this file (a one-line note) so the user knows the
 examples/constraints are reconstructed, not scraped verbatim.
 
 ## Step 6 — Write the worked example
@@ -164,8 +180,8 @@ method signature and body must come from an actual source, not from your
 own reading of the problem:
 - Check whether the user already pasted or attached a starter/solution
   file for this language in the conversation.
-- Check whether Step 3's fetch turned up an embedded starter-code template
-  for this language on the neetcode page.
+- Check whether Step 3's page render turned up an embedded starter-code
+  template for this language on the neetcode page.
 - If neither is available, **stop and ask the user to provide the
   solution/starter file for `<language>`** before creating anything in
   the language directory. Do not fabricate a signature or a stub body
