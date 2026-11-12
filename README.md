@@ -65,22 +65,38 @@ new problem workspace:
 
 ```
 <problem-slug>/
-└── notes/
-    └── worked-example.md
+├── notes/
+│   ├── problem.md
+│   └── worked-example.md
+└── <language>/   # e.g. python/, cpp/
 ```
 
-The `worked-example.md` is the core deliverable — a step-by-step derivation
-of the problem written like a math proof, not a finished-solution dump. It
-covers the problem restatement, the key insight behind the chosen approach,
-a concrete trace through an example (including an edge case), pseudocode,
-a brute-force vs. optimal complexity comparison, and edge cases worth
-sanity-checking.
+`problem.md` is the statement itself — description, examples/sample
+input, and constraints, saved as given. `worked-example.md` is the
+derivation built on top of it: a step-by-step walkthrough written like a
+math proof, not a finished-solution dump — the problem restatement, the
+key insight behind the chosen approach, a concrete trace through the
+sample input (including an edge case), pseudocode, a brute-force vs.
+optimal complexity comparison, and edge cases worth sanity-checking.
 
-The skill deliberately does **not** write any solution code or scaffold a
-language directory. Once you've read the worked example and are ready to
-code, you prompt separately for the best approach and the best-suited
-scaffolding (language, function signature, project files, etc.) — that's
-a distinct, later step from understanding the problem.
+The skill then scaffolds a project directory for the chosen language
+(config/build files, src, and a test suite built from `problem.md`'s
+examples plus the worked example's edge cases). It never invents the
+solution file's signature or body from the problem description — it uses
+an identified starter/solution file (pasted by you, or found on the
+neetcode page) as-is, or stops and asks you to provide one. Writing the
+actual algorithm is still a distinct, later step you ask for separately.
+
+The skill is resumable: if a problem's notes already exist and you ask
+for another language, it scaffolds only that language's directory rather
+than redoing the notes.
+
+Language rules currently exist for **Python** (`src/`/`tests/`, `uv`/
+pytest) and **C++** (`include/`/`src/`/`tests/`, CMake/ctest). Asking for
+any other language gets you a suggestion instead — either a minimal
+one-off stub, or describing your preferred conventions so they can be
+added to the skill.
 
 Trigger it by pasting a neetcode.io problem URL and asking to start, set
-up, or scaffold that problem.
+up, or scaffold that problem (optionally naming a language, e.g. "...in
+python").
