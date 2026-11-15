@@ -6,15 +6,15 @@
 bool Solution::isPalindrome(std::string s) {
     std::string::iterator it = s.begin();
     std::string::reverse_iterator rit = s.rbegin();
-    int mSize = static_cast<int>(std::ceil(s.length() / 2));
-    while (std::distance(s.begin(), it) < mSize) {
-        this->adjustForwardPointer(s, it);
 
-        if (it == s.end()) {
-          return false;
+    while (rit != s.rend()) {
+        this->adjustReversePointer(s, rit);
+
+        if (rit == s.rend()) {
+          return true;
         }
 
-        this->adjustReversePointer(s, rit);
+        this->adjustForwardPointer(s, it);
 
         int a = std::tolower(*it);
         int b = std::tolower(*rit);
@@ -31,14 +31,26 @@ bool Solution::isPalindrome(std::string s) {
 }
 
 
-void Solution::adjustForwardPointer(std::string s, std::string::iterator& it) {
-    while (!isValid(*it) && it != s.end()) {
+void Solution::adjustForwardPointer(std::string& s, std::string::iterator& it) {
+    while (it != s.end()) {
+        int v = *it;
+
+        if (isValid(v)) {
+            return;
+        }
+
         ++it;
     }
 }
 
-void Solution::adjustReversePointer(std::string s, std::string::reverse_iterator& rit) {
-    while (!isValid(*rit) && rit != s.rend()) {
+void Solution::adjustReversePointer(std::string& s, std::string::reverse_iterator& rit) {
+    while (rit != s.rend()) {
+        int v = *rit;
+
+        if (isValid(v)) {
+            return;
+        }
+
         ++rit;
     }
 }
