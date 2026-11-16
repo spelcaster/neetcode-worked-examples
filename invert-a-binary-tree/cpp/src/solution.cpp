@@ -1,23 +1,16 @@
 #include "solution.hpp"
 #include "tree_node.hpp"
+#include <utility>
 
 TreeNode* Solution::invertTree(TreeNode* root) {
-  if (root == nullptr) {
+  if (!root) {
     return root;
   }
 
-  if (root->left) {
-    this->invertTree(root->left);
-  }
+  std::swap(root->left, root->right);
 
-  if (root->right) {
-    this->invertTree(root->right);
-  }
-
-  TreeNode* tmpTree = root->left;
-
-  root->left = root->right;
-  root->right = tmpTree;
+  this->invertTree(root->left);
+  this->invertTree(root->right);
 
   return root;
 }
