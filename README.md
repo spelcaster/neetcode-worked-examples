@@ -55,6 +55,114 @@ python3 solution.py <<EOF
 EOF
 ```
 
+## Per-language commands
+
+Each problem directory holds one subdirectory per language
+(`<problem-slug>/python/`, `<problem-slug>/cpp/`, ...). Run these from
+inside that subdirectory.
+
+### Python (`uv` / pytest)
+
+```bash
+uv sync                      # install deps into .venv (first time / after editing pyproject.toml)
+
+uv run python src/solution.py   # run the solution file directly (if it has a __main__)
+echo "()[]{}" | uv run python src/solution.py   # ...with stdin input
+
+uv run pytest                # run the test suite
+uv run pytest -v             # verbose, one line per test case
+uv run pytest -k some_case   # run a single test by name/substring
+```
+
+### C++ (CMake / ctest)
+
+```bash
+cmake -S . -B build          # configure (first time / after editing CMakeLists.txt)
+cmake --build build          # build everything (main + tests)
+
+./build/main                 # run the interactive runner
+echo "()[]{}" | ./build/main # ...with stdin input
+
+./build/tests                # run the assert-based test suite directly
+ctest --test-dir build       # ...or via ctest
+ctest --test-dir build -V    # ...verbose, shows each assertion's output
+```
+
+`CMakeLists.txt` defaults `CMAKE_BUILD_TYPE` to `Debug` when none is set,
+so a plain `cmake -S . -B build` already builds with debug symbols
+(`-g`) — no separate debug build is needed for the Debug section below.
+
+## Debugging
+
+### C++ (`cgdb`)
+
+The default `Debug` build type already includes `-g`, so no special
+rebuild is required — just make sure `build/` was configured without
+overriding it:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug   # explicit, though it's the default
+cmake --build build
+```
+
+Then run the binary under `cgdb`:
+
+```bash
+cgdb ./build/main
+cgdb ./build/tests
+```
+
+Common `cgdb`/`gdb` commands once inside:
+
+```
+b solution.cpp:42   # set a breakpoint at a file:line
+run                  # start the program (add args after `run` if needed)
+n / s                # next line / step into
+p someVar            # print a variable
+bt                   # backtrace
+c                     # continue
+```
+
+If a binary was built with optimizations (e.g. `-DCMAKE_BUILD_TYPE=Release`),
+reconfigure with `-DCMAKE_BUILD_TYPE=Debug` and rebuild before debugging —
+optimized builds can make `cgdb`'s line-by-line stepping misleading or
+skip variables entirely.
+
+### Python (`pdb`)
+
+No special build step is needed — Python always runs with debug info available.
+
+Drop a breakpoint directly in the solution or test file:
+
+```python
+breakpoint()   # built-in since Python 3.7; equivalent to import pdb; pdb.set_trace()
+```
+
+Then run normally and execution will stop there:
+
+```bash
+uv run python src/solution.py
+uv run pytest -s   # -s so breakpoint() output isn't captured by pytest
+```
+
+Or run a whole script under `pdb` from the start, without editing it:
+
+```bash
+uv run python -m pdb src/solution.py
+```
+
+Common `pdb` commands once stopped:
+
+```
+n       # next line
+s       # step into
+c       # continue
+p someVar   # print a variable
+l       # list source around current line
+bt      # backtrace
+q       # quit
+```
+
 ## The `implement-neetcode` skill
 
 Located at [`.claude/skills/implement-neetcode/`](.claude/skills/implement-neetcode/SKILL.md).
