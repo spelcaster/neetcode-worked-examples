@@ -7,4 +7,6 @@ using std::vector;
 class Solution {
 public:
     int search(vector<int>& nums, int target);
+
+    int binarySearch(vector<int>& nums, int left, int right, int target);
 };
