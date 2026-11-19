@@ -13,6 +13,7 @@ int main() {
     assert(sol->lengthOfLongestSubstring("a") == 1);
     assert(sol->lengthOfLongestSubstring("xyz") == 3);
     assert(sol->lengthOfLongestSubstring("pwwkew") == 3);
+    assert(sol->lengthOfLongestSubstring("abaac") == 2);
 
     std::cout << "all tests passed" << std::endl;
     return 0;

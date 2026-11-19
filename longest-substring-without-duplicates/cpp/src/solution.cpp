@@ -1,46 +1,38 @@
 #include "solution.hpp"
 #include <map>
+#include <vector>
 
 int Solution::lengthOfLongestSubstring(string s) {
-  int left = 0;
-  int right = 0;
   int maxLength = 0;
 
   if (s.empty()) {
     return maxLength;
   }
 
-  std::map<char, int> window;
+  int left = 0;
+  int right = 0;
 
-  return this->search(s, maxLength, left, right, window);
-}
+  std::vector<int> lastPos(256, -1);
 
-int Solution::search(string& s, int maxLength, int left, int right, std::map<char, int>& window) {
-  if (!this->isValidPosition(right, s)) {
-    return maxLength;
+  while (this->isValidPosition(right, s)) {
+    int c = s[right];
+
+    if (lastPos[c] >= left) {
+      left = lastPos[c] + 1;
+    }
+
+    lastPos[c] = right;
+
+    int windowSize = right - left + 1;
+
+    if (windowSize > maxLength) {
+      maxLength = windowSize;
+    }
+
+    right++;
   }
 
-  char c = s[right];
-  auto it = window.find(c);
-
-  if (it != window.end()) {
-    left = it->second + 1;
-    auto nit = std::next(it);
-
-    window.erase(window.begin(), nit);
-  }
-
-  window.insert({c, right});
-
-  int windowSize = static_cast<int>(window.size());
-
-  if (windowSize > maxLength) {
-    maxLength = window.size();
-  }
-
-  right++;
-
-  return this->search(s, maxLength, left, right, window);
+  return maxLength;
 }
 
 bool Solution::isValidPosition(int pos, string& s) {
