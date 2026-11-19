@@ -1,33 +1,46 @@
 #include "solution.hpp"
-#include <unordered_map>
+#include <map>
 
 int Solution::lengthOfLongestSubstring(string s) {
   int left = 0;
   int right = 0;
+  int maxLength = 0;
 
-  std::unordered_map<char, bool> hashSet;
+  if (s.empty()) {
+    return maxLength;
+  }
 
-  return this->search(s, left, right, hashSet);
+  std::map<char, int> window;
+
+  return this->search(s, maxLength, left, right, window);
 }
 
-int Solution::search(string& s, int left, int right, std::unordered_map<char, bool>& hashSet) {
+int Solution::search(string& s, int maxLength, int left, int right, std::map<char, int>& window) {
   if (!this->isValidPosition(right, s)) {
-    return hashSet.size();
+    return maxLength;
   }
 
   char c = s[right];
-  auto it = hashSet.find(c);
+  auto it = window.find(c);
 
-  if (it != hashSet.end()) {
-    left++;
-    right++;
-    return this->search(s, left, right, hashSet);
+  if (it != window.end()) {
+    left = it->second + 1;
+    auto nit = std::next(it);
+
+    window.erase(window.begin(), nit);
   }
 
-  hashSet[c] = true;
+  window.insert({c, right});
+
+  int windowSize = static_cast<int>(window.size());
+
+  if (windowSize > maxLength) {
+    maxLength = window.size();
+  }
+
   right++;
 
-  return this->search(s, left, right, hashSet);
+  return this->search(s, maxLength, left, right, window);
 }
 
 bool Solution::isValidPosition(int pos, string& s) {
