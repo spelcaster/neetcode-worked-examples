@@ -1,11 +1,16 @@
 #include "solution.hpp"
+#include <functional>
+#include <queue>
 #include <unordered_map>
 #include <utility>
 
 std::unordered_map<int, int> Solution::shortestPath(int n, std::vector<std::vector<int>>& edges, int src) {
-  std::vector<int> distances(n, -1);
+  using Item = std::pair<int, int>;
 
-  std::vector<std::vector<std::pair<int, int>>> adjacencyList(n);
+  std::vector<int> distances(n, -1);
+  std::vector<bool> visited(n, false);
+
+  std::vector<std::vector<Item>> adjacencyList(n);
 
   for (const auto& edge : edges) {
     int u = edge[0], v = edge[1], w = edge[2];
@@ -13,7 +18,29 @@ std::unordered_map<int, int> Solution::shortestPath(int n, std::vector<std::vect
 
   }
 
-  this->calculate(distances, adjacencyList, src, 0);
+  std::priority_queue<Item, std::vector<Item>, std::greater<Item>> pq;
+
+  distances[src] = 0;
+  pq.push({0, src});
+
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+
+    if (visited[u]) {
+      continue;
+    }
+
+    visited[u] = true;
+
+    for (auto& [v, w] : adjacencyList[u]) {
+      if ((distances[v] == -1) || (d + w < distances[v])) {
+        distances[v] = d + w;
+        pq.push({distances[v], v});
+
+      }
+    }
+  }
 
   std::unordered_map<int, int> result;
 
@@ -22,20 +49,4 @@ std::unordered_map<int, int> Solution::shortestPath(int n, std::vector<std::vect
   }
 
   return result;
-}
-
-void Solution::calculate(std::vector<int>& distances, std::vector<std::vector<std::pair<int, int>>>& adjacencyList, int vertex, int weight) {
-  if ((distances[vertex] >= 0) && (distances[vertex] < weight)) {
-    return;
-  } else if ((distances[vertex] < 0) || (distances[vertex] > weight)) {
-    distances[vertex] = weight;
-  }
-
-  if (adjacencyList[vertex].empty()) {
-    return;
-  }
-
-  for (const auto& pair : adjacencyList[vertex]) {
-    this->calculate(distances, adjacencyList, pair.first, weight + pair.second);
-  }
 }
